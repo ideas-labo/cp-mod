@@ -1,0 +1,12 @@
+Apachebench-10000-100,Apachebench-10000-1000,Apachebench-1000-10
+allowHostHeaderMismatch,maxCookieCount,maxCookieCount
+maxConnections,maxHttpHeaderSize,maxHttpHeaderSize
+maxHeaderCount,maxHttpRequestHeaderSize,maxHttpRequestHeaderSize
+maxHttpHeaderSize,maxHttpResponseHeaderSize,maxHttpResponseHeaderSize
+maxHttpRequestHeaderSize,maxKeepAliveRequests,maxKeepAliveRequests
+maxHttpResponseHeaderSize,useVirtualThreads,useVirtualThreads
+maxKeepAliveRequests,,maxQueueSize
+maxQueueSize,,SSLEnabled
+maxThreads,,
+SSLEnabled,,
+useVirtualThreads,,
