@@ -105,7 +105,7 @@ Specifically, the documents include:
 
 ### 2: Create a ClangTool
 
-1. **Create a new tool directory and add it to the CMake build system:**
+1. **Create a tool directory and add it to the CMake build system:**
 
    ```
    cd ~/clang-llvm/llvm-project
@@ -114,7 +114,7 @@ Specifically, the documents include:
    vim clang-tools-extra/loop-convert/CMakeLists.txt
    ```
 
-   - Create a new directory and modify CMake files to include the new tool.
+   - Create a new directory and modify CMake files to include the tool.
 
 2. **Edit `CMakeLists.txt`:**
 
@@ -142,22 +142,22 @@ With that done, Ninja will be able to compile our tool. Let’s give it somethin
 3. loopsearch.cpp
 4. ifswitchlsearch.cpp
 
-### 3: Compiling the New Tool
+### 3: Compiling the Tool
 
-1. Compile the new tool:
+1. Compile the tool:
 
    ```
    cd ~/clang-llvm/build
    ninja functionsearch
    ```
 
-   - Run the `ninja` build tool from the build directory to compile the new tool.
+   - Run the `ninja` build tool from the build directory to compile the tool.
 
-### 4: Running the New Tool
+### 4: Running the Tool
 
-After compiling, the new tool (syntax checker) will be located in the `~/clang-llvm/build/bin` directory.
+After compiling, the tool (syntax checker) will be located in the `~/clang-llvm/build/bin` directory.
 
-### 5: New Tools Indroduction
+### 5: Tools Indroduction
 
 functionsearch.cpp: Search for the location where the target function is called within the specified file and function.
 
