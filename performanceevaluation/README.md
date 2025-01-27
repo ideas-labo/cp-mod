@@ -2,8 +2,8 @@
 
 The artifact has been tested with Python 3.10. Ensure you have one of these versions installed.
 
-**Performance test template: **
-### Test template
+### Performance test template:
+
 
 ```python
 
