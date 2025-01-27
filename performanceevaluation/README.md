@@ -1,4 +1,4 @@
-**This is our actual test code of all systems.**
+**This directory contains the installation and deployment guides for all software, the deployment guides for benchmarks, and the Python files we use for performance testing.**
 
 The artifact has been tested with Python 3.10. Ensure you have one of these versions installed.
 
