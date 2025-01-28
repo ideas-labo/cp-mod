@@ -38,6 +38,19 @@ Specifically, the documents include:
 
 > dependencies we found in each system.
 
+## Performance Evaluation
+
+1. Follow the [Instuction of the corresponding software](https://github.com/ideas-labo/cp-mod/blob/main/performanceevaluation/softwares/Hadoop(MarRuduce%2CHDFS%2CYarn)/InstallationGuide.md) for installation.
+2. Follow the [Instuction of the benchmarks](https://github.com/ideas-labo/cp-mod/blob/main/performanceevaluation/workloads/ApacheBench/InstallationGuide.md) for installation.
+3. Run the [py file](https://github.com/ideas-labo/cp-mod/blob/main/performanceevaluation/softwares/Hadoop(MarRuduce%2CHDFS%2CYarn)/Hadoop-Hibench.py) of the corresponding software. Please note that some file paths need to be changed to your practical paths.
+
+## Reproduce the tools in RQ3
+
+1. [Cdep](https://github.com/xlab-uiuc/cdep-fse-ae)
+2. [Safetune](https://github.com/SafeTuneTeam/SafeTune)
+3. [Gptuner](https://github.com/SolidLao/GPTuner)
+4. [Diagconfig](https://github.com/IntelligentDDS/DiagConfig)
+
 # Taint Analysis tool
 
 ## CPPtools
@@ -198,4 +211,3 @@ ifswitchlsearch.cpp: Search for the locations where if(switch) control flow appe
 > **controlflowsearch.java**: Search for the locations where control flow(while for switch if try) appears in the program.
 >
 > **functionsearch.java**: Search for the location where the target function is called within the program.
-
