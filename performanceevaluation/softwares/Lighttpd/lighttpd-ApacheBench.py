@@ -50,7 +50,7 @@ def clear_lighttpd_conf(file_path):
 # Function to start the lighttpd service
 def startsys():
     try:
-        subprocess.run(f"echo {password} | sudo -S /usr/local/sbin/lighttpd -f /home/lhy/lighttpd-server/config/lighttpd.conf", shell=True, check=True,
+        subprocess.run(f"echo {password} | sudo -S {lighttpdpath} -f {filepath}", shell=True, check=True,
                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     except Exception as e:
         print(e)
@@ -92,12 +92,20 @@ def calculate_change(current, standard):
 
 # Main function
 if __name__ == '__main__':
-    filepath = "/path/to/config.conf"  # Path to the configuration file
-    confdata = read_csv_to_dict("/path/to/test.csv")  # Path to the CSV file with configurations
+    # Configuration file path
+    filepath = "/path/to/config/lighttpd.conf"
+    # Your lighttpd install folder
+    lighttpdpath = "/usr/local/sbin/lighttpd"
+    # Read configuration data from a CSV file
+    confdata = read_csv_to_dict("cp-mod/performanceevaluation/SamplingSet/lighttpdtest.csv")
+    # Specific a result folder
+    resultpath = "/path/to/results"
+
+    password = "Your password"
 
     # Loop through each workload configuration
     for requests, concurrency in workloads:
-        results_file = f"/path/to/results/Apache-bench-{requests}-{concurrency}.csv"  # Define the results file
+        results_file = f"{resultpath}/Apache-bench-{requests}-{concurrency}.csv"  # Define the results file
 
         # Check if the results file already exists, if so, skip
         if os.path.exists(results_file):

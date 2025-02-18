@@ -47,7 +47,7 @@ def clear_redis_conf(file_path):
 
 # Function to add configuration settings to Redis config file
 def add_config_to_redis_conf(file_path, configname, configvalue):
-    command = f"echo '{configname} {configvalue}' > /path/to/redis/config/redis.conf"
+    command = f"echo '{configname} {configvalue}' > {filepath}"
     command1 = "redis-cli shutdown"
 
     with open("/dev/null", "w") as devnull:
@@ -74,15 +74,23 @@ def calculate_change(current, standard):
 
 # Main execution block
 if __name__ == '__main__':
-    # Configuration file path and data source
-    filepath = "/path/to/redis/config/redis.conf"
-    confdata = read_csv_to_dict("/path/to/config/data.csv")
-    tps_stand = 0.375789474
-    latency_stand = 0.097052632
 
+    # Redis folder location in your device
+    redispath = "/path/to/redis"
+    # Configuration file path and data source
+    configdatapath = "path/to/config/data"
+    # Specific a result folder
+    resultpath = "/path/to/results"
+
+
+
+
+    filepath = f"{redispath}/config/redis.conf"
+
+    confdata = read_csv_to_dict(f"{configdatapath}")
     # Loop through the workloads
     for workload_type, num_requests, concurrency in workloads:
-        results_file = f"/path/to/results/redisbenchmark-{workload_type}-{num_requests}-{concurrency}.csv"
+        results_file = f"{resultpath}redisbenchmark-{workload_type}-{num_requests}-{concurrency}.csv"
 
         # Check if the result file already exists
         if os.path.exists(results_file):

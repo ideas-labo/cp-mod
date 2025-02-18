@@ -44,7 +44,7 @@ def clear_httpd_conf(file_path):
 
 def startsys():
     try:
-        subprocess.run(f"echo {password} | sudo -S /usr/local/httpd/bin/apachectl start", shell=True, check=True,
+        subprocess.run(f"echo {password} | sudo -S {httpdpath}/bin/apachectl start", shell=True, check=True,
                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     except Exception as e:
         print(e)
@@ -53,7 +53,7 @@ def startsys():
     return True
 
 def stopsys():
-    commandstop = f"echo {password} | sudo -S /usr/local/httpd/bin/apachectl stop"
+    commandstop = f"echo {password} | sudo -S {httpdpath}/bin/apachectl stop"
     try:
         subprocess.run(commandstop, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     except Exception as e:
@@ -84,15 +84,22 @@ def calculate_change(current, standard):
     return ((current - standard) / standard) * 100 if standard != 0 else 0
 
 if __name__ == '__main__':
-    filepath = "/path/to/httpd.conf"  # Update the path as necessary
-    confdata = read_csv_to_dict("/path/to/test.csv")  # Update the path as necessary
+    # Configuration file path
+    filepath = "/path/to/httpd.conf"
+    # path tp httpd folder
+    httpdpath = "/usr/local/httpd/"
+    # Read configuration data from a CSV file
+    confdata = read_csv_to_dict("cp-mod/performanceevaluation/SamplingSet/httpdtest.csv")
 
-    # Replace actual data with placeholders
-    RPS_stand = None  # Placeholder for actual standard RPS value
-    TPR_stand = None  # Placeholder for actual standard TPR value
+    resultpath = "/path/to/results"
+
+    password = "Your password"
+
+
+
 
     for requests, concurrency in workloads:
-        results_file = f"/path/to/results/Apache-bench-{requests}-{concurrency}.csv"  # Update the path as necessary
+        results_file = f"{resultpath}/Apache-bench-{requests}-{concurrency}.csv"  # Update the path as necessary
 
         # Check if the result file exists
         if os.path.exists(results_file):
@@ -137,19 +144,11 @@ if __name__ == '__main__':
 
             print(f"Average RPS: {RPS_avg}, Average TPR: {TPR_avg} ms")
 
-            # Calculate the change if the standard values are provided
-            if RPS_stand is not None and TPR_stand is not None:
-                RPSchange = calculate_change(RPS_avg, RPS_stand)
-                TPRchange = calculate_change(TPR_avg, TPR_stand)
 
-                print(f"Average RPS change: {RPSchange}, Average TPR change: {TPRchange}")
-            else:
-                print("Standard values for RPS and TPR are not set. Skipping change calculation.")
-
-            results.append([conf['name'], conf['valuename'], conf['value'], RPS_avg, TPR_avg, RPSchange, TPRchange])
+            results.append([conf['name'], conf['valuename'], conf['value'], RPS_avg, TPR_avg,])
 
             # Save results to CSV file
             with open(results_file, 'w', newline='') as file:
                 writer = csv.writer(file)
-                writer.writerow(['Name', 'ValueName', 'Value', 'Average RPS', 'Average TPR', 'RPS Change', 'TPR Change'])
+                writer.writerow(['Name', 'ValueName', 'Value', 'Average RPS', 'Average TPR'])
                 writer.writerows(results)

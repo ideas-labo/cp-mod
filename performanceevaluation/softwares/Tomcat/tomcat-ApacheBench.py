@@ -53,7 +53,7 @@ def modify_server_xml(server_xml_path, attribute, new_value):
 
 def start_tomcat():
     try:
-        subprocess.run(f"echo {password} | sudo -S /usr/local/tomcat/bin/startup.sh", shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        subprocess.run(f"echo {password} | sudo -S {tomcatpath}/bin/startup.sh", shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     except Exception as e:
         print(e)
         return False
@@ -62,7 +62,7 @@ def start_tomcat():
 
 def stop_tomcat():
     try:
-        subprocess.run(f"echo {password} | sudo -S /usr/local/tomcat/bin/shutdown.sh", shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        subprocess.run(f"echo {password} | sudo -S {tomcatpath}/bin/shutdown.sh", shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     except Exception as e:
         print(e)
 
@@ -78,17 +78,28 @@ def calculate_change(current, standard):
     return ((current - standard) / standard) * 100 if standard != 0 else 0
 
 if __name__ == '__main__':
-    server_xml_path = '/path/to/tomcat/conf/server.xml'  # Path to Tomcat server.xml
+
+    # Path to tomcat folder
+    tomcatpath = "/usr/local/tomcat"
+
+    resultpath = "/path/to/results"  # Specific a result folder
+
+    # Password for sudo commands
+    password = 'your_password_here'
+    
+    
+    server_xml_path = f'{tomcatpath}/conf/server.xml'  # Path to Tomcat server.xml
     backup_path = '/path/to/backup/server_backup.xml'   # Path for server.xml backup
-    confdata = read_csv_to_dict('/path/to/csv/test.csv')  # Path to configuration data CSV file
-    RPS_stand = 0
-    TPR_stand = 0
+
+    # Read configuration data from a CSV file (adjust file path as necessary)
+    confdata = read_csv_to_dict("cp-mod/performanceevaluation/SamplingSet/tomcattest.csv")
+
 
     # Backup the original server.xml file
     backup_server_xml(server_xml_path, backup_path)
 
     for requests, concurrency in workloads:
-        results_file = f"/path/to/results/Apachebench-{requests}-{concurrency}.csv"  # Path to save results
+        results_file = f"{resultpath}/Apachebench-{requests}-{concurrency}.csv"  # Path to save results
 
         # Check if result file already exists
         if os.path.exists(results_file):
@@ -109,7 +120,7 @@ if __name__ == '__main__':
             modify_server_xml(server_xml_path, conf['name'], conf['value'])
 
             if not start_tomcat():
-                results.append([conf['name'], conf['valuename'], conf['value'], 'error', 'error', 'error', 'error'])
+                results.append([conf['name'], conf['valuename'], conf['value'], 'error', 'error',])
                 continue
 
             for i in range(1, 6):
@@ -123,7 +134,7 @@ if __name__ == '__main__':
                 TPR_list.append(TPR)
 
             if bench_output == "error":
-                results.append([conf['name'], conf['valuename'], conf['value'], 'timeout', 'timeout', 'timeout', 'timeout'])
+                results.append([conf['name'], conf['valuename'], conf['value'], 'timeout', 'timeout',])
                 continue
 
             RPS_list = np.array(RPS_list)
@@ -139,7 +150,7 @@ if __name__ == '__main__':
         # Save results to CSV file
         with open(results_file, 'w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(['Name', 'ValueName', 'Value', 'Average RPS', 'Average TPR', 'RPS Change', 'TPR Change'])
+            writer.writerow(['Name', 'ValueName', 'Value', 'Average RPS', 'Average TPR',])
             writer.writerows(results)
 
     # Restore original server.xml file

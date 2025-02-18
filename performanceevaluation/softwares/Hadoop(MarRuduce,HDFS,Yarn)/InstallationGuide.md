@@ -30,16 +30,13 @@
    Add the following lines at the top of the file:
    ```bash
    export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-   export JRE_HOME=${JAVA_HOME}/jre  
-   export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib  
-   export PATH=${JAVA_HOME}/bin:$PATH
    ```
-
+   
    Apply the changes:
    ```bash
    source ~/.bashrc
    ```
-
+   
    Check if JAVA_HOME is set correctly:
    ```bash
    echo $JAVA_HOME
@@ -76,13 +73,26 @@
 1. Download Hadoop from [Tsinghua Mirror](https://mirrors.tuna.tsinghua.edu.cn/apache/hadoop/common/hadoop-3.3.5/).
 2. Upload the `.tar.gz` file to `/usr/local/` and extract:
    ```bash
-   tar -zxvf hadoop- 3.3.5.tar.gz
+   tar -zxvf hadoop-3.3.5.tar.gz	/usr/local
+   ```
+
+3. Navigate to the extracted folder, rename `hadoop-3.3.5` to `hadoop`, and modify the permissions:
+    ```bash
+    sudo mv /usr/local/hadoop-3.3.5 /usr/local/hadoop
+    sudo chown -R hadoop ./hadoop
+    ```
+
+4. Check our Hadoop is available：
+
+   ```bash
+   cd /usr/local/hadoop
+   ./bin/hadoop version
    ```
 
 ### 3.2 Configure Hadoop Files
 
 #### **core-site.xml**
-Edit `/etc/hadoop/core-site.xml` and add:
+Edit `/usr/local/hadoop/etc/hadoop/core-site.xml` and add:
 ```xml
 <property>
     <name>hadoop.tmp.dir</name>
@@ -96,7 +106,7 @@ Edit `/etc/hadoop/core-site.xml` and add:
 ```
 
 #### **hdfs-site.xml**
-Edit `/etc/hadoop/hdfs-site.xml` and add:
+Edit `/usr/local/hadoop/etc/hadoop/hdfs-site.xml` and add:
 ```xml
 <property>
     <name>dfs.replication</name>
@@ -112,22 +122,17 @@ Edit `/etc/hadoop/hdfs-site.xml` and add:
 </property>
 ```
 
-#### **hadoop-env.sh**
-Edit `hadoop-env.sh`:
-```bash
-export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
-```
-
 ---
 
 ## 4. Run Hadoop
 
 1. **Initialize HDFS**
    Run the following command to format the namenode:
+   
    ```bash
    bin/hdfs namenode -format
    ```
-
+   
 2. **Start NameNode and DataNode**
    Run:
    ```bash
@@ -137,6 +142,10 @@ export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
 3. **Check Running Processes**
    Use `jps` to check the processes.
 
+   ```bash
+   jps
+   ```
+   
 4. **Stop Hadoop**
    Run:
    ```bash
@@ -148,18 +157,10 @@ export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
 
 ---
 
-## 5. Create Hadoop User Group
-
-1. **Create a Hadoop User**
-   ```bash
-   sudo useradd -m hadoop -s /bin/bash
-   sudo passwd hadoop
-   sudo adduser hadoop sudo
-   ```
 
 ---
 
-## 6. Configure YARN
+## 5. Configure YARN
 
 1. **Check Hostname**
    Run:
@@ -182,13 +183,14 @@ export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
 
 3. **Configure `mapred-site.xml`**
    Edit `/etc/hadoop/mapred-site.xml`:
+   
    ```xml
    <property>
        <name>mapreduce.framework.name</name>
        <value>yarn</value>
    </property>
    ```
-
+   
 4. **Start YARN**
    Run:
    ```bash
@@ -204,4 +206,3 @@ export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
 ---
 
 By following these steps, you will have Hadoop successfully installed and configured on your system.
-```

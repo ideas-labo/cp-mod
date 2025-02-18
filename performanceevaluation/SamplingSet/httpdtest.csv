@@ -1,0 +1,51 @@
+name,valuename,value
+AcceptFilter,http httpready,http httpready
+AcceptFilter,http data,http data
+CGIVar,REQUEST_URI current-uri,REQUEST_URI current-uri
+CGIVar,REQUEST_URI original-uri,REQUEST_URI original-uri
+ContentDigest,On,On
+ContentDigest,Off,Off
+EnableMMAP,On,On
+EnableMMAP,Off,Off
+EnableSendfile,On,On
+EnableSendfile,Off,Off
+ExtendedStatus,On,On
+ExtendedStatus,Off,Off
+FlushMaxPipelined,default,5
+FlushMaxPipelined,no limit,-1
+FlushMaxPipelined,max,500
+FlushMaxThreshold,default,65535
+FlushMaxThreshold,min,0
+FlushMaxThreshold,max,1000000
+HostnameLookups,On,On
+HostnameLookups,Off,Off
+HostnameLookups,Double,Double
+KeepAlive,On,On
+KeepAlive,Off,Off
+KeepAliveTimeout,default,5
+KeepAliveTimeout,max,500
+KeepAliveTimeout,min,1
+LimitInternalRecursion,default,10
+LimitInternalRecursion,max,1000
+LimitInternalRecursion,min,1
+LimitRequestBody,default,1073741824
+LimitRequestBody,min,102400
+LimitRequestBody,minin,1024
+LimitRequestFields,default,100
+LimitRequestFields,min,1
+LimitRequestFields,max,10000
+LimitRequestFieldSize,default,8190
+LimitRequestFieldSize,min,512
+LimitRequestFieldSize,max,81900
+LimitRequestLine,default,8190
+LimitRequestLine,min,512
+LimitRequestLine,max,81900
+LimitXMLRequestBody,default,1000000
+LimitXMLRequestBody,max,51200
+LimitXMLRequestBody,min,1073741824
+LogLevel,warn,warn
+LogLevel,error,error
+LogLevel,notice,notice
+MaxKeepAliveRequests,default,100
+MaxKeepAliveRequests,max,500
+MaxKeepAliveRequests,min,1

@@ -1,3 +1,120 @@
+## Run the Tools
+
+The executable files after compilation are in the folder `cp-mod/taintanalysis/cpp/ExecutableFile ` 
+
+> cp-mod/taintanalysis/cpp/ExecutableFile/forline
+> cp-mod/taintanalysis/cpp/ExecutableFile/functionline
+> cp-mod/taintanalysis/cpp/ExecutableFile/ifswitchline
+> cp-mod/taintanalysis/cpp/ExecutableFile/variableline
+
+Before running, we need to add executable permissions to the file.
+
+```
+chmod +x ./forline
+chmod +x ./functionline
+chmod +x ./ifswitchline
+chmod +x ./variableline
+```
+
+#### Indroduction
+
+The results will be printed out in the terminal. It may contain some error messages indicating that the link cannot be established. Please ignore them.
+
+
+
+**forline**: Search for the locations where loop(while for) control flow appears in the specified file.
+
+```
+./forline {cpp/c filepath}
+```
+
+The result form is 
+
+```
+Line{startline}:{endline}
+```
+
+In our test case
+
+```
+./forline /testcase/test.cpp
+Line17:19
+```
+
+
+
+**functionline**: Search for the location where the target function is called within the specified file and function.
+
+```
+./functionline --functionname {functionname} {cpp/c filepath}
+```
+
+The result form is 
+
+```
+line: {linenumber}
+```
+
+In our test case
+
+```
+./functionline --functionname divide /testcase/test.cpp
+line: 51
+```
+
+
+
+**ifswitchline**: Search for the locations where if(switch) control flow appears in the specified file.
+
+```
+./ifswitchline {cpp/c filepath}
+```
+
+The result form is 
+
+```
+Line{startline}:{endline}
+```
+
+In our test case
+
+```
+./ifswitchline /testcase/test.cpp
+Line25:27
+```
+
+
+
+**variableline**: Search for the target variable initialization location and the location where it is called within the specified file.
+
+```
+./variableline {variablename} {cpp/c filepath}
+```
+
+The result form is 
+
+```
+line: {linenumber}
+```
+
+In our test case
+
+```
+./variableline num1/testcase/test.cpp
+line: 32
+line: 35
+line: 42
+line: 45
+line: 48
+line: 51
+```
+
+
+
+
+
+## Compile from source code
+
 ### 1: Obtaining Clang
 
 1. **Create a working directory and download the LLVM project:**
@@ -77,21 +194,22 @@
    ```
    set(LLVM_LINK_COMPONENTS support)
    
-   add_clang_executable(loop-convert
-     LoopConvert.cpp
+   add_clang_executable(mytool
+     mytool.cpp
      )
-   target_link_libraries(loop-convert
+   target_link_libraries(mytool
      PRIVATE
-     clangAST
-     clangASTMatchers
+     clangTooling
      clangBasic
+     clangASTMatchers
+     clangAST
      clangFrontend
      clangSerialization
-     clangTooling
      )
+   
    ```
 
-With that done, Ninja will be able to compile our tool. Let’s give it something to compile! Put the following into `clang-tools-extra/loop-convert/functionsearch.cpp`. 
+With that done, Ninja will be able to compile our tool. Let’s give it something to compile! Put the following code into `clang-tools-extra/mytool.cpp`. 
 
 1. functionsearch.cpp
 2. varsearch.cpp
@@ -103,41 +221,16 @@ With that done, Ninja will be able to compile our tool. Let’s give it somethin
 1. Compile the new tool:
 
    ```
-   cd ~/clang-llvm/build
-   ninja functionsearch
+   cd llvm-project/build
+   
+   cmake -G Ninja ../llvm -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra" -DLLVM_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release
+   
+   sudo ninja
    ```
-
+   
    - Run the `ninja` build tool from the build directory to compile the new tool.
 
 ### 4: Running the New Tool
 
-After compiling, the new tool (syntax checker) will be located in the `~/clang-llvm/build/bin` directory.
-
-### 5: New Tools Indroduction
-
-functionsearch.cpp: Search for the location where the target function is called within the specified file and function.
-
-```
-./functionsearch -name {function} -fun {targetfunction} {file}
-```
-
-varsearch.cpp: Search for the target variable initialization location and the location where it is called within the specified file.
-
-```
-./varsearch -var {var} ./searchfold/redis-6.2.12/src/{file}
-```
-
-loopsearch.cpp:  Search for the locations where loop(while for) control flow appears in the specified file.
-
-```
-./loopsearch {file}
-```
-
-ifswitchlsearch.cpp: Search for the locations where if(switch) control flow appears in the specified file.
-
-```
-./ifswitchlsearch {file}
-```
-
-
+After compiling, the new tool (syntax checker) will be located in the `~/clang-llvm/build/bin` directory named `mytool`. You can rename it.
 

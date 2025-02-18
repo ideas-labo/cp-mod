@@ -14,7 +14,7 @@ password = 'your_password_here'
 def run_tomcat_benchmark(id):
     try:
         # Replace with the correct path to your JMeter installation and test files
-        command = f"/path/to/jmeter -n -t /path/to/tomcat/{id}.jmx -l /path/to/results.jtl -j /path/to/jmeter.log"
+        command = f"{JmeterPath} -n -t {tomcatpath}/{id}.jmx -l {JmeterPath}/results.jtl -j {JmeterPath}.log"
         result = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, timeout=10)
     except Exception as e:
         print(e)
@@ -46,7 +46,7 @@ def modify_server_xml(server_xml_path, attribute, new_value):
 def start_tomcat():
     try:
         # Replace with your Tomcat startup command and correct password handling
-        subprocess.run(f"echo {password} | sudo -S /path/to/tomcat/bin/startup.sh", shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        subprocess.run(f"echo {password} | sudo -S {tomcatpath}/bin/startup.sh", shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     except Exception as e:
         print(e)
         return False
@@ -56,7 +56,7 @@ def start_tomcat():
 def stop_tomcat():
     try:
         # Replace with your Tomcat shutdown command and correct password handling
-        subprocess.run(f"echo {password} | sudo -S /path/to/tomcat/bin/shutdown.sh", shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        subprocess.run(f"echo {password} | sudo -S {tomcatpath}/bin/shutdown.sh", shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     except Exception as e:
         print(e)
 
@@ -68,16 +68,25 @@ def read_csv_to_dict(filename):
             data.append(row)
     return data
 
-def calculate_change(current, standard):
-    return ((current - standard) / standard) * 100 if standard != 0 else 0
 
 if __name__ == '__main__':
-    # Replace with the correct path to your server.xml file and backup location
-    server_xml_path = '/path/to/tomcat/conf/server.xml'
-    backup_path = '/path/to/tomcat/server_backup.xml'
+    # Path to tomcat folder
+    tomcatpath = "/usr/local/tomcat"
+
+    resultpath = "/path/to/results"  # Specific a result folder
+
+    # Password for sudo commands
+    password = 'your_password_here'
+
+    # path to jmeter
+    JmeterPath = "/usr/local/Jmeter/apache-jmeter-5.6.3/bin/jmeter"
 
     # Read configuration data from a CSV file (adjust file path as necessary)
-    confdata = read_csv_to_dict('/path/to/tomcat/test.csv')
+    confdata = read_csv_to_dict("cp-mod/performanceevaluation/SamplingSet/tomcattest.csv")
+
+    # Replace with the correct path to your server.xml file and backup location
+    server_xml_path = f'{tomcatpath}/conf/server.xml'
+    backup_path = f'{tomcatpath}/server_backup.xml'
     
     start_tomcat()
 
@@ -86,7 +95,7 @@ if __name__ == '__main__':
 
     for id in range(1, 3):
         # Replace with your actual results file path
-        results_file = f"/path/to/tomcat/tomcat-jmeter-{id}.csv"
+        results_file = f"{resultpath}/tomcat-jmeter-{id}.csv"
         
         throughput_list = []
         for i in range(1, 6):

@@ -12,7 +12,7 @@ password = 'password'
 def run_jmeter(sys, id):
     try:
         # Command to run JMeter
-        command = f"/path/to/jmeter -n -t /path/to/jmeter/{sys}/{id}.jmx -l /path/to/results.jtl -j /path/to/jmeter.log"
+        command = f"{JmeterPath} -n -t {JmeterPath}/{sys}/{id}.jmx -l {JmeterPath}/results.jtl -j {JmeterPath}.log"
         result = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                 text=True, timeout=20)
     except Exception as e:
@@ -41,7 +41,7 @@ def add_config_to_conf(file_path, configname, configvalue):
 def start_sys():
     try:
         # Start the system (example using Apache HTTPD)
-        subprocess.run(f"echo {password} | sudo -S /path/to/apachectl start", shell=True, check=True,
+        subprocess.run(f"echo {password} | sudo -S {httpdpath}/apachectl start", shell=True, check=True,
                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     except Exception as e:
         print(e)
@@ -51,7 +51,7 @@ def start_sys():
 
 # Function to stop the system
 def stop_sys():
-    commandstop = f"echo {password} | sudo -S /path/to/apachectl stop"
+    commandstop = f"echo {password} | sudo -S {httpdpath}/apachectl stop"
     try:
         subprocess.run(commandstop, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     except Exception as e:
@@ -78,12 +78,25 @@ def calculate_change(current, standard):
 
 # Main function to run the workload
 if __name__ == '__main__':
+
+    # path tp httpd folder
+    httpdpath = "/usr/local/httpd/"
+    # Configuration file path
     filepath = "/path/to/httpd.conf"
-    confdata = read_csv_to_dict("/path/to/config.csv")
+    # Read configuration data from a CSV file
+    confdata = read_csv_to_dict("cp-mod/performanceevaluation/SamplingSet/httpdtest.csv")
+    # path to jmeter
+    JmeterPath = "/usr/local/Jmeter/apache-jmeter-5.6.3/bin/jmeter"
+
+    resultpath = "/path/to/results"
+
+    password = "Your password"
+
+
     sys = "httpd"
 
     for id in range(1, 3):
-        results_file = f"/path/to/results/{sys}-jmeter-{id}.csv"
+        results_file = f"{resultpath}/{sys}-jmeter-{id}.csv"
         
         # Stop the system before starting the test
         stop_sys()

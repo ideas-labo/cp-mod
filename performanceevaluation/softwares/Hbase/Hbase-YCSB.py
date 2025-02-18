@@ -88,13 +88,13 @@ def clear_hadoop_conf(file_path):
 
 def start_hbase():
     # Replace with the correct command to start HBase
-    command = "/path/to/hbase/bin/start-hbase.sh"
+    command = f"{hbasepath}/bin/start-hbase.sh"
     run_command(command, timeout=20)
 
 def stop_hbase():
     # Replace with the correct command to stop HBase
     command1 = "hbase-daemon.sh stop master"
-    command2 = "/path/to/hbase/bin/stop-hbase.sh"
+    command2 = f"/{hbasepath}/bin/stop-hbase.sh"
     run_command(command1, timeout=10)
     run_command(command2, timeout=20)
 
@@ -115,7 +115,7 @@ def add_config_to_hadoop_conf(file_path, configname, configvalue):
 
 def write_results_to_csv(results):
     # Write results to CSV file (adjust path as needed)
-    with open("/path/to/result.csv", 'w', encoding='utf-8', newline='') as csvfile:
+    with open(f"{resultpath}/result.csv", 'w', encoding='utf-8', newline='') as csvfile:
         writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         
         writer.writerow(['conf_name', 'conf_valuename', 'conf_value', 'runtime', 'throughput'])
@@ -128,8 +128,15 @@ if __name__ == '__main__':
     # Replace with your actual YCSB home directory path
     YCSB_HOME = "/path/to/ycsb"
     # Replace with your actual Hadoop config file path
-    filepath = '/path/to/hbase/conf/hbase-site.xml'
-    confdata = read_csv_to_dict("/path/to/HadoopGT/hbasetests/test.csv")
+    confdata = read_csv_to_dict("/cp-mod-icse2025/cp-mod/performanceevaluation/SamplingSet/hbasetest.csv")
+
+    hbasepath = "/path/to/hbase"
+
+    filepath = f'{hbasepath}/conf/hbase-site.xml'
+
+    resultpath = "/resultpath"
+
+    password = " your password"
 
     # Store all results
     results = []

@@ -133,11 +133,16 @@ def is_outlier(points, thresh=2.0):
 
 if __name__ == '__main__':
 
+        # Before running, there are several specific setting steps.
         config_file = "/etc/mysql/conf.d/mysql.cnf"
-        section = 'mysqld'
-        sys_password = "777777"
+        sys_password = "your password"
         confdata = read_csv_to_dict("mysqltest.csv")
+        outputfile = "./mysqlsysbenchresult.csv"
 
+
+
+
+        section = 'mysqld'
         results = []
 
 
@@ -174,7 +179,7 @@ if __name__ == '__main__':
 
 
                 results.append([conf['optionname'], conf['valuename'], conf['value'], tps,qps,latency])
-                with open('result.csv', 'w', newline='') as file:
+                with open(outputfile, 'w', newline='') as file:
                     writer = csv.writer(file)
                     writer.writerows(results)
 

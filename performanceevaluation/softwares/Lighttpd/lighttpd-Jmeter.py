@@ -13,7 +13,7 @@ password = 'password_here'
 def run_jmeter(sys, id):
     try:
         # JMeter command with dynamic arguments
-        command = f"/path/to/jmeter/bin/jmeter -n -t /path/to/jmeter/{sys}/{id}.jmx -l /path/to/jmeter/results.jtl -j /path/to/jmeter/jmeter.log"
+        command = f"{JmeterPath}bin/jmeter -n -t {JmeterPath}{sys}/{id}.jmx -l {JmeterPath}/results.jtl -j {JmeterPath}jmeter.log"
 
         result = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                 text=True, timeout=20)
@@ -84,13 +84,25 @@ def calculate_change(current, standard):
 # Main execution block
 if __name__ == '__main__':
     # Configuration file path and data source
-    filepath = "/path/to/config/config.conf"
-    confdata = read_csv_to_dict("/path/to/data/config.csv")
+    filepath = "/path/to/config/lighttpd.conf"
+    # Your lighttpd install folder
+    lighttpdpath = "/usr/local/sbin/lighttpd"
+    # Read configuration data from a CSV file
+    confdata = read_csv_to_dict("cp-mod/performanceevaluation/SamplingSet/lighttpdtest.csv")
+    # path to jmeter
+    JmeterPath = "/usr/local/Jmeter/apache-jmeter-5.6.3/bin/jmeter"
+    # Specific a result folder
+    resultpath = "/path/to/results"
+
+    password = "Your password"
+
+
+
     sys = "lighttpd"
 
     # Loop through test IDs
     for id in range(1, 3):
-        results_file = f"/path/to/results/{sys}-jmeter-{id}.csv"
+        results_file = f"{resultpath}/{sys}-jmeter-{id}.csv"
         stop_sys()
         clear_conf(filepath)
         start_sys()

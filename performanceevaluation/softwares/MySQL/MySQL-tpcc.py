@@ -107,11 +107,13 @@ def clearconf(config_file):
 if __name__ == '__main__':
 
     config_file = "/etc/mysql/conf.d/mysql.cnf"
-    section = 'mysqld'
-    sys_password = "password"  # Replace with actual password or secure method
-    confdata = read_csv_to_dict("config_file.csv")  # Replace with actual CSV file path
-   
+    sys_password = "your password"  # Replace with actual password or secure method
+    confdata = read_csv_to_dict("cp-mod/performanceevaluation/SamplingSet/mysqltest.csv")  # Replace with actual CSV file path
+    outputfile = "./mysqltpccresult.csv"
 
+
+    section = 'mysqld'
+    results = []
     for conf in confdata:
         # Clear configuration file
         clearconf(config_file)
@@ -140,7 +142,7 @@ if __name__ == '__main__':
                 print(f"{i}th TpmC: {TpmC} ms")
 
             results.append([conf['optionname'], conf['valuename'], conf['value'], TpmC])
-            with open('results.csv', 'w', newline='') as file:
+            with open(outputfile, 'w', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerows(results)
 

@@ -85,24 +85,32 @@ if __name__ == '__main__':
         'yarn': 'yarn-site.xml'
     }
 
-    # Specify the software you want to test
-    software = "mapreduce or yarn or hdfs"
-    
-    # Construct the file path using the software variable
-    filepath = f'/path/to/hadoop/etc/hadoop/{xmlfile[software]}'
+
+    # Specify the software you want to test : hdfs mapreduce yarn
+    software = "mapreduce"
+    # Your Hadoop location
+    HadoopPath = "/usr/local/hadoop"
+    # your Hibench location
+    HibenchPath = "/usr/local/hibench"
+
+
+    # Read configuration data from a CSV file
+    confdata = read_csv_to_dict(f"cp-mod/performanceevaluation/SamplingSet/{software}test.csv")
+
+    filepath = f'{HadoopPath}/etc/hadoop/{xmlfile[software]}'
+
+    reportpath = f"{HibenchPath}/report/hibench.report"
 
     # Start Hadoop services
     startsys()
 
-    # Read configuration data from a CSV file (adjust file path as necessary)
-    confdata = read_csv_to_dict(f"/path/to/HadoopGT/{software}test2.csv")
 
     for conf in confdata:
         # Clear existing configuration from the Hadoop config file
         clear_hadoop_conf(filepath)
 
         # Log the configuration change to a report file
-        with open("/path/to/HiBench/report/hibench.report", 'a', encoding='utf-8') as file:
+        with open(f"{HibenchPath}/report/hibench.report", 'a', encoding='utf-8') as file:
             file.write(f"{conf['name']}|{conf['valuename']}|{conf['value']}\n")
         print(f"{conf['name']}|{conf['valuename']}|{conf['value']}")
 

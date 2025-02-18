@@ -3,36 +3,30 @@ import subprocess
 import numpy as np
 import time
 import re
+import shutil
 import os
+import xml.etree.ElementTree as ET
+
+# Password for sudo commands
+password = 'your_password_here'
 
 # Define different workload parameter combinations
-workloads = [
-    (1000, 100),
-    (10000, 100),
-    (10000, 1000),
-    (1000, 10),
-]
-
-def run_nginx_benchmark(requests, concurrency):
-    # Run nginx performance test command
+def run_jmeter(sys, id):
     try:
-        command = f"ab -n {requests} -c {concurrency} http://127.0.0.1:90/test.html"
-        result = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, timeout=10)
+        # Command to run JMeter
+        command = f"{JmeterPath} -n -t {JmeterPath}/{sys}/{id}.jmx -l {JmeterPath}/results.jtl -j {JmeterPath}.log"
+        result = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                text=True, timeout=20)
     except Exception as e:
         print(e)
         return "error"
     return result.stdout
 
 def extract_data_from_output(output):
-    # Use regular expressions to match key performance metrics
-    requests_per_second_pattern = r"Requests per second:\s+(\d+\.\d+)"
-    time_per_request_pattern = r"Time per request:\s+(\d+\.\d+)"
-
-    # Extract metrics
-    requests_per_second = re.search(requests_per_second_pattern, output).group(1)
-    time_per_request = re.search(time_per_request_pattern, output).group(1)
-
-    return requests_per_second, time_per_request
+    """Extract throughput value from the JMeter output."""
+    throughput_pattern = r"summary =\s+\d+\s+in\s+\d+:\d+:\d+\s+=\s+([\d.]+)/s"
+    throughput = re.search(throughput_pattern, output).group(1)
+    return float(throughput)
 
 def clear_nginx_conf(file_path):
     # Clear the nginx configuration file
@@ -42,7 +36,7 @@ def clear_nginx_conf(file_path):
 def startsys():
     # Start the nginx server
     try:
-        subprocess.run(f"echo {password} | sudo -S /path/to/nginx-server/sbin/nginx", shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        subprocess.run(f"echo {password} | sudo -S {nginxpath}/sbin/nginx", shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     except Exception as e:
         print(e)
         return False
@@ -52,7 +46,7 @@ def startsys():
 def reloadsys():
     # Reload nginx server
     try:
-        subprocess.run(f"echo {password} | sudo -S /path/to/nginx-server/sbin/nginx -s reload", shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        subprocess.run(f"echo {password} | sudo -S /{nginxpath}/sbin/nginx -s reload", shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     except Exception as e:
         print(e)
         return False
@@ -61,7 +55,7 @@ def reloadsys():
 
 def stopsys():
     # Stop nginx server
-    commandstop = f"echo {password} | /path/to/nginx-server/sbin/nginx -s stop"
+    commandstop = f"echo {password} | {nginxpath}/sbin/nginx -s stop"
     try:
         subprocess.run(commandstop, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     except Exception as e:
@@ -86,73 +80,76 @@ def read_csv_to_dict(filename):
             data.append(row)
     return data
 
+
 def calculate_change(current, standard):
-    # Calculate percentage change
+    """Calculate the percentage change."""
     return ((current - standard) / standard) * 100 if standard != 0 else 0
 
 if __name__ == '__main__':
-    # Set the path for the nginx config file
-    filepath = "/path/to/nginx.conf"
-    confdata = read_csv_to_dict("/path/to/newtest.csv")
-    
+    # Define the path to the configuration file
+    filepath = "path_to_nginx.conf"
+
+    confdata = read_csv_to_dict("cp-mod/performanceevaluation/SamplingSet/nginxtest.csv")
+
+    resultpath = "/path/to/results" # Specific a result folder
+
+    # Password for sudo commands
+    password = 'your_password_here'
+
+    # Your nginx path
+    nginxpath = "/usr/local/nginx-server"
+
+    # path to jmeter
+    JmeterPath = "/usr/local/Jmeter/apache-jmeter-5.6.3/bin/jmeter"
 
 
+    sys = "Nginx"
+    for id in range(1, 3):
+        results_file = f"{resultpath}/nginx-bench-{id}.csv"
+        startsys()
+        throughput_list = []
+        
+        # Run the benchmark 5 times
+        for i in range(1, 6):
+            bench_output = run_jmeter(sys, id)
+            throughput = extract_data_from_output(bench_output)
+            throughput_list.append(float(throughput))
+        
+        throughput_list = np.array(throughput_list)
+        throughput_avg = np.mean(throughput_list) if len(throughput_list) else None
 
-    for requests, concurrency in workloads:
-        # Define the result file for the current workload
-        results_file = f"/path/to/nginx-bench-{requests}-{concurrency}.csv"
-
-        # Check if the result file already exists
+        # Check if result file already exists
         if os.path.exists(results_file):
-            print(f"Result file for workload {requests}-{concurrency} already exists. Skipping...")
+            print(f"Result file for workload {id} already exists. Skipping...")
             continue
 
-        print(f"Running workload: {requests} requests, {concurrency} concurrency")
-
+        print(f"Running workload: {id}")
         results = []
         clear_nginx_conf(filepath)
-
+        
+        # Modify configuration and run benchmarks
         for conf in confdata:
-            startsys()
-            clear_nginx_conf(filepath)
-            print(f"{conf['name']} {conf['valuename']} {conf['value']}")
+            print(f"Modifying {conf['name']} to {conf['value']}")
 
-            RPS_list = []
-            TPR_list = []
-
-            # Add the configuration to nginx and reload the server
             if not add_config_to_nginx_conf(filepath, conf['name'], conf['value']):
                 results.append([conf['name'], conf['valuename'], conf['value'], 'error', 'error'])
                 continue
 
-            # Run the benchmark and extract data
-            for i in range(1, 5):
-                bench_output = run_nginx_benchmark(requests, concurrency)
-                if bench_output == "error":
-                    break
-                RPS, TPR = extract_data_from_output(bench_output)
-                print(f"{i}th : Requests per second:{RPS}, Time per request: {TPR} ms")
-                RPS_list.append(float(RPS))
-                TPR_list.append(float(TPR))
-
+            bench_output = run_jmeter(sys, id)
             if bench_output == "error":
-                results.append([conf['name'], conf['valuename'], conf['value'], 'timeout', 'timeout', 'timeout', 'timeout'])
+                results.append([conf['name'], conf['valuename'], conf['value'], 'timeout', 'timeout'])
                 continue
 
-            RPS_list = np.array(RPS_list)
-            TPR_list = np.array(TPR_list)
+            throughput = extract_data_from_output(bench_output)
 
-            RPS_avg = np.mean(RPS_list) if len(RPS_list) else None
-            TPR_avg = np.mean(TPR_list) if len(TPR_list) else None
+            print(f"Throughput: {throughput}")
 
-            print(f"Average RPS: {RPS_avg}, Average TPR: {TPR_avg} ms")
+            throughputchange = calculate_change(throughput, throughput_avg)
 
+            results.append([conf['name'], conf['valuename'], conf['value'], throughput, throughputchange])
 
-            print(f"Average RPS change: {RPSchange}, Average TPR change: {TPRchange}")
-            results.append([conf['name'], conf['valuename'], conf['value'], RPS_avg, TPR_avg])
-
-        # Save results to CSV file
-        with open(results_file, 'w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(['Name', 'ValueName', 'Value', 'Average RPS', 'Average TPR', 'RPS Change', 'TPR Change'])
-            writer.writerows(results)
+            # Save results to CSV file
+            with open(results_file, 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(['Name', 'ValueName', 'Value', 'Throughput', 'ThroughputChange'])
+                writer.writerows(results)

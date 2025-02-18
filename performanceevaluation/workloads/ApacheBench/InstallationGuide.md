@@ -62,15 +62,7 @@ To test the performance of a website receiving 1000 requests:
 ab -n 1000 -c 10 http://www.example.com/
 ```
 
-### 2. Testing with POST Data
-To send POST requests with data from a file (`data.txt`):
-```bash
-ab -p data.txt -T application/x-www-form-urlencoded -n 500 -c 20 http://www.example.com/api
-```
-- **`-p data.txt`**: Specifies the file containing the POST data.
-- **`-T application/x-www-form-urlencoded`**: Sets the content type for the request.
-
-### 3. KeepAlive Test
+### 2. KeepAlive Test
 To test server performance with HTTP KeepAlive enabled:
 ```bash
 ab -k -n 1000 -c 50 http://www.example.com/
